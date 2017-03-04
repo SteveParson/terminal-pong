@@ -10,7 +10,7 @@ int	WINSIZE_CHANGE	=	0;
 int	PADDLE_SIZE	=	6;
 	
 // Window resize callback
-void winresize(int dummyvar) {
+void winResize(int dummyvar) {
 	
 	// Set flag to indicate window size changed
 	WINSIZE_CHANGE = 1;
@@ -32,8 +32,8 @@ void drawPaddle(int ypos, int xpos) {
 int main(int argc, char** argv) {
 
 	// position, screen boundaries, direction constants
-	int	x = 0,
-		y = 0,
+	int	x = 11,
+		y = 11,
 		maxX = 0,
 		maxY = 0,
 		nextX = 0,
@@ -46,12 +46,10 @@ int main(int argc, char** argv) {
 		
 	
 	// Initialize screen
-	WINDOW* w = initscr();
-
 	// Use non-blocking getch()
+	WINDOW* w = initscr();
 	cbreak();
 	nodelay(w, TRUE);
-
 	noecho();
 	curs_set(FALSE);
 	
@@ -59,8 +57,7 @@ int main(int argc, char** argv) {
 	getmaxyx(stdscr, maxY, maxX);
 	
 	// Set up signal handler in case user resizes terminal
-	signal(SIGWINCH, winresize);
-	printf("hello");
+	signal(SIGWINCH, winResize);
 	
 	while(true) {
 
@@ -75,7 +72,7 @@ int main(int argc, char** argv) {
 		}			
 			
 		// Wait, then redraw at new position
-		usleep(20000);
+		usleep(30000);
 		clear();
 		printw("Window Size Y=%d X=%d\n", maxY, maxX);
 		printw("Position Y=%d X=%d\n", y, x);
@@ -83,6 +80,7 @@ int main(int argc, char** argv) {
 		kbinput = getch();
 
 		// Very basic keyboard handling
+		// Use '['  and   ']' to move paddle
 		if(kbinput != ERR) {
 			
 			if(kbinput == '[') 
@@ -98,6 +96,14 @@ int main(int argc, char** argv) {
 		// Handle bounce off of the walls
 		nextX = x + dirX;
 		nextY = y + dirY;
+		
+		// Very basic paddle bounce
+		if(	nextX	== 10	&&
+			dirX	== -1	&&
+			padY	<= y	&&
+			padY+6	>= y
+		)
+			dirX *= -1;
 		
 		// Hit X boundary, change direction
 		if(nextX >= maxX || nextX < 0)
