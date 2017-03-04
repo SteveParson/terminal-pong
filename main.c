@@ -7,9 +7,7 @@
 #include <sys/ioctl.h>
 
 int	WINSIZE_CHANGE	=	0;
-int	DEBUG		=	1;
-
-
+int	PADDLE_SIZE	=	6;
 	
 // Window resize callback
 void winresize(int dummyvar) {
@@ -24,6 +22,13 @@ void winresize(int dummyvar) {
 
 }
 
+void drawPaddle(int ypos, int xpos) {
+	for(int i=0; i<=PADDLE_SIZE; i++)
+		mvprintw(ypos+i, xpos, "|");
+}
+
+
+
 int main(int argc, char** argv) {
 
 	// position, screen boundaries, direction constants
@@ -34,10 +39,19 @@ int main(int argc, char** argv) {
 		nextX = 0,
 		nextY = 0,
 		dirX = 1,
-		dirY = 1;
+		dirY = 1,
+		padX = 10,
+		padY = 10;
+	char	kbinput;
+		
 	
 	// Initialize screen
-	initscr();	
+	WINDOW* w = initscr();
+
+	// Use non-blocking getch()
+	cbreak();
+	nodelay(w, TRUE);
+
 	noecho();
 	curs_set(FALSE);
 	
@@ -61,11 +75,24 @@ int main(int argc, char** argv) {
 		}			
 			
 		// Wait, then redraw at new position
-		usleep(40000);
+		usleep(20000);
 		clear();
 		printw("Window Size Y=%d X=%d\n", maxY, maxX);
 		printw("Position Y=%d X=%d\n", y, x);
 		mvprintw(y,x, "@");
+		kbinput = getch();
+
+		// Very basic keyboard handling
+		if(kbinput != ERR) {
+			
+			if(kbinput == '[') 
+				padY -= 2;
+			if(kbinput == ']') 
+				padY += 2;
+
+		}
+
+		drawPaddle(padY,padX);
 		refresh();
 
 		// Handle bounce off of the walls
