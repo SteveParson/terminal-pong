@@ -1,6 +1,6 @@
 CC	= gcc
 CFLAGS	= -g -Wall
-LFLAGS	= -lncurses
+LFLAGS	= -lncurses -lm
 TARGET = main
 all: $(TARGET)
 
