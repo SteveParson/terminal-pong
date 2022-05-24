@@ -24,7 +24,13 @@ void winResize(int dummyvar) {
 }
 
 // Draw the paddle
-void drawPaddle(int ypos, int xpos) {
+void drawPaddleA(int ypos, int xpos) {
+    for(int i = 0; i <= PADDLE_SIZE; i++) {
+        mvprintw(ypos + i, xpos, "*");
+    }
+}
+
+void drawPaddleB(int ypos, int xpos) {
     for(int i = 0; i <= PADDLE_SIZE; i++) {
         mvprintw(ypos + i, xpos, "*");
     }
@@ -36,7 +42,8 @@ int main(int argc, char **argv) {
         maxX  = 0,  maxY = 0,
         nextX = 0,  nextY = 0,
         dirX  = 1,  dirY  = 1,
-        padX  = 10, padY  = 10;
+        padAX  = 10, padAY  = 10,
+        padBX  = 130, padBY  = 10;
     
     double relposbX = 0,
            relpospY = 0,
@@ -67,30 +74,42 @@ int main(int argc, char **argv) {
             
             x    = round(maxX * relposbX);
             y    = round(maxY * relposbY);
-            padY = round(maxY * relpospY);
+            padAY = round(maxY * relpospY);
+            padBY = round(maxY * relpospY);
             
             WINSIZE_CHANGE = 0;
         } else {
             // Wait, then redraw at new position
             usleep(50000);
             clear();
-            printw("[ and ] to move paddle.  Q to quit\n");
+            printw("\n");
+            printw("		player A : r and f to move paddle.\n");
+            printw("		player B : p and m to move paddle. \n");
+            printw("	    		   Q to quit\n");
 
             mvprintw(y, x, "O");
             kbinput = getch();
 
             // Very basic keyboard handling
-            // Use '['  and   ']' to move paddle
+            // Use 'r'  and   'f' to move paddle (PA)
+            // Use 'p'  and   'm' to move paddle (PB)
             if(kbinput != ERR) {
                 
-                if(kbinput == '[' && padY >= 2) {
-                    padY -= 2;
+                if(kbinput == 'r' && padAY >= 2) {
+                    padAY -= 2;
                 }
                 
-                if(kbinput == ']'
-                   && padY < (maxY - PADDLE_SIZE - 2)) {
+                if(kbinput == 'f' && padAY < (maxY - PADDLE_SIZE - 2)) {
                     
-                    padY += 2;
+                    padAY += 2;
+                }
+
+                if(kbinput == 'p' && padBY >= 2) {
+                    padBY -= 2;
+                }
+
+                if(kbinput == 'm' && padBY < (maxY - PADDLE_SIZE - 2)) {
+                    padBY += 2;
                 }
                 
                 if(kbinput == 'q' || kbinput == 'Q') {
@@ -100,7 +119,8 @@ int main(int argc, char **argv) {
                 }
             }
 
-            drawPaddle(padY, padX);
+            drawPaddleA(padAY, padAX);
+            drawPaddleB(padBY, padBX);
             refresh();
 
             // Handle bounce off of the walls
@@ -110,17 +130,46 @@ int main(int argc, char **argv) {
             // Very basic paddle bounce
             if(nextX == 10
                && dirX == -1
-               && padY <= nextY
-               && (padY + PADDLE_SIZE) >= nextY) {
+               && padAY <= nextY
+               && (padAY + PADDLE_SIZE) >= nextY) {
                 dirX *= -1;
             }
+
+            if(nextX == 130
+               && dirX == -1
+               && padBY <= nextY
+               && (padBY + PADDLE_SIZE) >= nextY) {
+                dirX *= -1;
+            }
+
             
             if(nextX == 9
                && dirX == 1
-               && padY <= nextY
-               && (padY + PADDLE_SIZE) >= nextY) {
+               && padAY <= nextY
+               && (padAY + PADDLE_SIZE) >= nextY) {
                     dirX *= -1;
             }
+
+            if(nextX == 131
+               && dirX == 1
+               && padBY <= nextY
+               && (padBY + PADDLE_SIZE) >= nextY) {
+                    dirX *= -1;
+            }
+
+	    if (x < (padAX - 5)) {
+		    printf("Player B wins !");
+                    endwin();
+                    return 0;
+	    }
+
+	    if (x > (padBX + 5)) {
+		    printf("Player A wins !");
+                    endwin();
+                    return 0;
+	    }
+
+
 
             // Hit X boundary, change direction
             if(nextX >= maxX || nextX < 0) {
@@ -141,7 +190,8 @@ int main(int argc, char **argv) {
             if(maxX > 0 && maxY > 0) {
                 relposbX = (double) x / maxX;
                 relposbY = (double) y / maxY;
-                relpospY = (double) padY / maxY;
+                relpospY = (double) padAY / maxY;
+                relpospY = (double) padBY / maxY;
             }
         }
     }
