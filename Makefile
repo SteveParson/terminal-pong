@@ -1,8 +1,14 @@
-CC	= gcc
+CC=gcc
 CFLAGS	= -g -Wall
 LFLAGS	= -lncurses -lm
-TARGET = main
-all: $(TARGET)
+TARGET1 = 1player
+TARGET2 = 2players
 
-$(TARGET): $(TARGET).c
-	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).c $(LFLAGS)
+1player: $(TARGET1)
+$(TARGET1): $(TARGET1).c
+	$(CC) $(CFLAGS) -o $(TARGET1) $(TARGET1).c $(LFLAGS)
+
+2players: $(TARGET2)
+$(TARGET2): $(TARGET2).c
+	$(CC) $(CFLAGS) -o $(TARGET2) $(TARGET2).c $(LFLAGS)
+
