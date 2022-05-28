@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
             // Wait, then redraw at new position
             usleep(50000);
             clear();
-            printw("[ and ] to move paddle.  Q to quit\n");
+            printw("j and k to move paddle.  Q to quit\n");
 
             mvprintw(y, x, "O");
             kbinput = getch();
@@ -83,11 +83,11 @@ int main(int argc, char **argv) {
             // Use '['  and   ']' to move paddle
             if(kbinput != ERR) {
                 
-                if(kbinput == '[' && padY >= 2) {
+                if(kbinput == 'k' && padY >= 2) {
                     padY -= 2;
                 }
                 
-                if(kbinput == ']'
+                if(kbinput == 'j'
                    && padY < (maxY - PADDLE_SIZE - 2)) {
                     
                     padY += 2;
@@ -122,6 +122,12 @@ int main(int argc, char **argv) {
                     dirX *= -1;
             }
 
+	    if (x < (padX - 5)) {
+		    printf("You lose !");
+		    endwin();
+		    return 0;
+	    }
+
             // Hit X boundary, change direction
             if(nextX >= maxX || nextX < 0) {
                 dirX *= -1;
@@ -149,3 +155,4 @@ int main(int argc, char **argv) {
     endwin();
     return 0;
 }
+
